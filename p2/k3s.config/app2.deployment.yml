@@ -12,9 +12,27 @@ spec:
       labels:
         app: app2
     spec:
+      volumes:
+        - name: app2-vol
+          configMap:
+            name: app-configmap
       containers:
         - name: app2
-          image: nginx:latest
+          image: richarvey/nginx-php-fpm
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: APP_NAME
+              value: "App2"
+          volumeMounts:
+            - name: app2-vol
+              mountPath: /var/www/html
           ports:
             - containerPort: 80
 ---

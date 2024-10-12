@@ -5,15 +5,20 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |v|
     v.name = "p2-aaitounaS"
-    v.memory = 1024
-    v.cpus = 1
+    v.memory = 2024
+    v.cpus = 3
   end
 
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update -y
     apt install net-tools -y
     curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode=644
-  SHELL
 
+    while [ ! -d /vagrant ]; do
+      echo "Waiting for /vagrant to be ready..."
+      sleep 2
+    done
+    kubectl apply -f /vagrant/k3s.config/
+  SHELL
   config.vm.network "private_network", ip: "192.168.56.110"
 end
