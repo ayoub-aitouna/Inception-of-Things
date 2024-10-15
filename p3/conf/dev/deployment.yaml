@@ -12,29 +12,11 @@ spec:
       labels:
         app: app
     spec:
-      volumes:
-        - name: app-vol
-          configMap:
-            name: app-configmap
       containers:
         - name: app
-          image: richarvey/nginx-php-fpm
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: APP_NAME
-              value: "App"
-          volumeMounts:
-            - name: app-vol
-              mountPath: /var/www/html
+          image: aitayoub/playground:v1
           ports:
-            - containerPort: 80
+            - containerPort: 8888
 ---
 apiVersion: v1
 kind: Service
@@ -46,5 +28,5 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: 80 
+      targetPort: 8888 
   type: ClusterIP

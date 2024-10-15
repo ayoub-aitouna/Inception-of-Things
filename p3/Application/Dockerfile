@@ -7,6 +7,5 @@ COPY . /src/app
 WORKDIR /src/app
 
 EXPOSE 8888
-ENTRYPOINT [ "tail", "-f" ]
-
-# ENTRYPOINT [ "sh", "/src/app/scripts/init.sh" ]
+    
+ENTRYPOINT [ "sh", "/src/app/scripts/init.sh" ]
