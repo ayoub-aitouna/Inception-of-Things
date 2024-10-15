@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/ayoub-aitouna/Inception-of-Things.git
     targetRevision: HEAD
-    path: p3/manifests/dev
+    path: p3/conf/dev
   destination:
     server: https://kubernetes.default.svc # k8s cluster API server
     namespace: dev
