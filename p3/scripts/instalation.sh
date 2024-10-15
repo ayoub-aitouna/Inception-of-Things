@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $(id -u) -ne 0 ]; then
+  echo "Please run as root (use sudo)"
+  exit
+fi
+
 # Add Docker's official GPG key:
 apt-get update -y
 
