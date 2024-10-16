@@ -78,7 +78,7 @@ InstallKubeCtl() {
 }
 
 StartnConfigureCluster() {
-  
+
   echo "Creating/Configuring k3d $1 cluster ....."
 
   k3d cluster create $1 --api-port 6550 --servers 1 --agents 3 --port 8080:80@loadbalancer --port 32000:32000@agent:0 --volume $(pwd)/vagrant:/src@all --wait

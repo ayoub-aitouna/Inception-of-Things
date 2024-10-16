@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    kubernetes.io/ingress.ingressClassName: "nginx"
+    alb.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: app-service
+            port:
+              number: 8080
+    host: app1.com
