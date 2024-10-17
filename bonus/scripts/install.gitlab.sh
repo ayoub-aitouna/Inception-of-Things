@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 InstallHelm() {
     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg >/dev/null
     apt-get install apt-transport-https --yes
@@ -15,11 +14,9 @@ InstallGitLab() {
     # Updates your local Helm repository index to get the latest chart versions.
     helm repo update
 
+    kubectl create namespace gitlab
     helm upgrade --install gitlab gitlab/gitlab \
-        --timeout 600s \
-        --set global.hosts.domain=example.com \
-        --set global.hosts.externalIP=127.0.0.1 \
-        --set certmanager-issuer.email=me@example.com
+        --namespace gitlab --timeout 600s -f conf/gitlab/values.yaml
 }
 
 # check if helm is installed

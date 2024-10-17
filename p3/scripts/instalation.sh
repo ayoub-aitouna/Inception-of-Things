@@ -1,16 +1,5 @@
 #!/bin/bash
 
-if [ $(id -u) -ne 0 ]; then
-  echo "Please run as root (use sudo)"
-  exit
-fi
-
-# Add Docker's official GPG key:
-
-Update() {
-  apt-get update -y
-}
-
 InstallDocker() {
   if [ -x "$(command -v docker)" ]; then
     echo "INFO: Docker is already installed"
@@ -44,7 +33,7 @@ InstallDocker() {
 
 InstallK3D() {
   if [ -x "$(command -v k3d)" ]; then
-    echo "INFO: Docker is already installed"
+    echo "INFO: KubeK3D is already installed"
     return
   fi
   curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -52,7 +41,7 @@ InstallK3D() {
 
 InstallKubeCtl() {
   if [ -x "$(command -v kubectl)" ]; then
-    echo "INFO: Docker is already installed"
+    echo "INFO: Kubectl is already installed"
     return
   fi
   echo "Installing kubectl ....."
@@ -78,7 +67,7 @@ InstallKubeCtl() {
 }
 
 StartnConfigureCluster() {
-  
+
   echo "Creating/Configuring k3d $1 cluster ....."
 
   k3d cluster create $1 --api-port 6550 --servers 1 --agents 3 --port 8080:80@loadbalancer --port 32000:32000@agent:0 --volume $(pwd)/vagrant:/src@all --wait
@@ -113,13 +102,56 @@ StartnConfigureCluster() {
     "value": "--enable-ssl-passthrough"
     }]'
 
+
+  # a rollout to wait for argocd to spin up
+  kubectl rollout status deployment argocd-server -n argocd
+
   kubectl apply -f conf/argocd.ingress.yaml
   kubectl apply -f conf/application.yaml
 
   echo "$1 Cluster created and configured successfully"
 }
 
-Update
+AddDnsRecord() {
+  echo "Adding DNS record $1 $2"
+  host = $1
+  ip = $2
+  if ! grep -q "$host" /etc/hosts; then
+    echo "$ip $host" >>/etc/hosts
+  fi
+}
+
+ConfigureDns() {
+  ip=$(ip -4 addr show docker0 | grep -oP 'inet \K[\d.]+')
+  AddDnsRecord "argo.org.local" $ip
+  AddDnsRecord "app1.com" $ip
+}
+
+if [ $(id -u) -ne 0 ]; then
+  echo "Please run as root (use sudo)"
+  exit
+fi
+
+flag_update=false
+
+while getopts "u" option; do
+  case $option in
+  u)
+    flag_update=true
+    ;;
+  ?)
+    exit 1
+    ;;
+  esac
+done
+
+# Shift off the processed options
+shift $((OPTIND - 1))
+
+if [ "$flag_update" = true ]; then
+  apt-get update -y
+fi
+
 InstallDocker
 InstallK3D
 InstallKubeCtl
