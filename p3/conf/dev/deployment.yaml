@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: aitayoub/playground:v1
+          image: aitayoub/playground:v2
           ports:
             - containerPort: 8888
 ---
